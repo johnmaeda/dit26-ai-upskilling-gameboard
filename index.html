@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark" data-view="full">
+<html lang="en" data-theme="dark" data-view="full" data-role="design">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,6 +37,55 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Role Toggle */
+.role-toggle-container {
+  position: fixed;
+  top: 1rem;
+  right: 4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 100;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+}
+.role-toggle-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+.role-toggle-label.active {
+  color: var(--accent);
+  font-weight: 600;
+}
+.role-toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.role-toggle::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: var(--accent);
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+[data-role="uxr"] .role-toggle::before {
+  transform: translateX(20px);
 }
 
 /* Theme Toggle */
@@ -83,7 +132,7 @@ body {
   height: 44px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--accent);
+  background: var(--surface);
   cursor: pointer;
   display: none;
   align-items: center;
@@ -92,15 +141,55 @@ body {
   z-index: 100;
 }
 .fixed-expand-btn:hover {
-  background: var(--accent-hover);
+  border-color: var(--accent);
+  background: var(--bg);
 }
 .fixed-expand-btn svg {
   width: 20px;
   height: 20px;
-  fill: white;
+  fill: var(--text);
 }
 [data-view="compact"] .fixed-expand-btn {
   display: flex;
+  right: 1rem;
+}
+
+/* Fixed Photo Button (compact mode only) */
+.fixed-photo-btn {
+  position: fixed;
+  top: 1rem;
+  right: 4rem;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 100;
+}
+.fixed-photo-btn:hover {
+  border-color: var(--accent);
+  background: var(--bg);
+}
+.fixed-photo-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--text);
+}
+[data-view="compact"] .fixed-photo-btn {
+  display: flex;
+}
+
+/* Compact mode: hide role and theme toggles, keep only expand button */
+[data-view="compact"] .role-toggle-container {
+  display: none;
+}
+[data-view="compact"] .theme-toggle {
+  display: none;
 }
 
 header { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-right: 60px; }
@@ -151,6 +240,23 @@ h2 a:hover { text-decoration: underline; }
   height: 16px;
   fill: white;
 }
+
+.reset-btn {
+  background: transparent;
+  color: var(--muted);
+  padding: 0.6rem 1.1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.reset-btn:hover {
+  color: var(--text);
+  border-color: var(--muted);
+}
+
 .expand-icon { display: none; }
 .compress-icon { display: block; }
 [data-view="compact"] .expand-icon { display: block; }
@@ -573,13 +679,23 @@ footer a:hover { text-decoration: underline; }
   <svg class="moon-icon" viewBox="0 0 24 24"><path d="M9.37 5.51A7.35 7.35 0 0 0 9.1 7.5c0 4.08 3.32 7.4 7.4 7.4.68 0 1.35-.09 1.99-.27A7.014 7.014 0 0 1 12 19c-3.86 0-7-3.14-7-7 0-2.93 1.81-5.45 4.37-6.49zM12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
 </button>
 
-<button class="fixed-expand-btn" onclick="toggleView()" aria-label="Expand view">
+<div class="role-toggle-container">
+  <span class="role-toggle-label active" data-role-label="design" onclick="setRole('design')">Design</span>
+  <div class="role-toggle" onclick="toggleRole()" aria-label="Switch between Design and UXR"></div>
+  <span class="role-toggle-label" data-role-label="uxr" onclick="setRole('uxr')">UXR</span>
+</div>
+
+<button class="fixed-expand-btn" onclick="toggleView()" aria-label="Expand view" data-html2canvas-ignore>
   <svg viewBox="0 0 24 24"><path d="M21 11V3h-8l3.29 3.29-10 10L3 13v8h8l-3.29-3.29 10-10L21 11z"/></svg>
 </button>
 
+<button class="fixed-photo-btn" onclick="takeScreenshot()" aria-label="Take screenshot" data-html2canvas-ignore>
+  <svg viewBox="0 0 24 24"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+</button>
+
 <header>
-  <h1>Appendix: SAE × E-P-I-A-S Gameboard</h1>
-  <h2>AI Upskilling Framework for Product Designers | <a href="https://github.com/aji-ai/dit-2026/blob/main/ai-upskilling-for-product-designers.md">On GitHub</a></h2>
+  <h1 id="page-title">Appendix: SAE × E-P-I-A-S Gameboard</h1>
+  <h2 id="page-subtitle">AI Upskilling Framework for Product Designers | <a id="github-link" href="https://github.com/aji-ai/dit-2026/blob/main/ai-upskilling-for-product-designers.md">On GitHub</a></h2>
 </header>
 
 <div class="share-cta">
@@ -593,6 +709,7 @@ footer a:hover { text-decoration: underline; }
     <svg class="expand-icon" viewBox="0 0 24 24"><path d="M21 11V3h-8l3.29 3.29-10 10L3 13v8h8l-3.29-3.29 10-10L21 11z"/></svg>
     <span class="btn-label">Compact</span>
   </button>
+  <button class="reset-btn" onclick="clearAllStates()">Reset</button>
 </div>
 
 <div class="instructions">
@@ -798,6 +915,9 @@ footer a:hover { text-decoration: underline; }
   <p style="margin-top: 0.5rem;">Go deep before you go wide.</p>
 </footer>
 
+<!-- html2canvas CDN for screenshot functionality -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
 <!-- Modal -->
 <div class="modal-overlay" id="modal">
   <div class="modal-content">
@@ -816,8 +936,44 @@ footer a:hover { text-decoration: underline; }
 </div>
 
 <script>
-// Cell explanations data
-const cellData = {
+// =============================================
+// CONTENT CONFIGURATION BY ROLE
+// =============================================
+
+const roleConfig = {
+  design: {
+    title: "Appendix: SAE × E-P-I-A-S Gameboard",
+    subtitle: "AI Upskilling Framework for Product Designers",
+    githubLink: "https://github.com/aji-ai/dit-2026/blob/main/ai-upskilling-for-product-designers.md",
+    levels: [
+      { name: "CLASSICAL DESIGNER", nameCompact: "CLASSICAL<BR />DESIGNER", emoji: "🚫", tagline: "Craft fundamentals (and they still matter)", taglineCompact: "Craft fundamentals" },
+      { name: "MARKETING DESIGNER × AI", nameCompact: "MARKETING<BR />DESIGNER × AI", emoji: "", tagline: "Better thinking (and draft assets in minutes)", taglineCompact: "Better thinking" },
+      { name: "PRODUCT DESIGNER × AI", nameCompact: "PRODUCT<BR/>DESIGNER × AI", emoji: "", tagline: "Bigger thinking (and non-production prototypes in hours)", taglineCompact: "Reusable outputs" },
+      { name: "DESIGN ENGINEER × AI", nameCompact: "DESIGN<br/>ENGINEER × AI", emoji: "", tagline: "Persistent workflows (and real production PRs)", taglineCompact: "Persistent workflows" },
+      { name: "SUPER DESIGN ENGINEER × AI", nameCompact: "SUPER DESIGN<Br/>ENGINEER × AI", emoji: "", tagline: "Autonomous execution (your work done while you sleep)", taglineCompact: "Autonomous execution" },
+      { name: "AI × AI", nameCompact: "AI × AI<br />SINGULARITY", emoji: "", tagline: "Goal-setting only (and we're not there yet)", taglineCompact: "Goal-setting only" }
+    ]
+  },
+  uxr: {
+    title: "Appendix: SAE × E-P-I-A-S Gameboard",
+    subtitle: "AI Upskilling Framework for UX Researchers",
+    githubLink: "https://github.com/aji-ai/dit-2026/blob/main/ai-upskilling-for-uxr.md",
+    levels: [
+      { name: "CLASSICAL UX RESEARCHER", nameCompact: "CLASSICAL<BR />UX RESEARCHER", emoji: "🔬", tagline: "Research fundamentals (and they still matter)", taglineCompact: "Research fundamentals" },
+      { name: "AI-ASSISTED UX RESEARCHER", nameCompact: "AI-ASSISTED<BR />UX RESEARCHER", emoji: "🔬➕", tagline: "Better thinking (and first drafts in minutes)", taglineCompact: "Better thinking" },
+      { name: "PARTIALLY AUTOMATED UXR", nameCompact: "PARTIALLY<BR/>AUTOMATED UXR", emoji: "🔬🧠", tagline: "Broader synthesis (verified themes in hours)", taglineCompact: "Broader synthesis" },
+      { name: "GUIDED AUTOMATION UXR", nameCompact: "GUIDED<br/>AUTOMATION UXR", emoji: "🔬😴", tagline: "Persistent verification (scaled insights across studies)", taglineCompact: "Persistent verification" },
+      { name: "MOSTLY AUTOMATED UXR", nameCompact: "MOSTLY<Br/>AUTOMATED UXR", emoji: "🔬🤖", tagline: "Autonomous monitoring (pipeline runs while you sleep)", taglineCompact: "Autonomous monitoring" },
+      { name: "AI × AI RESEARCH", nameCompact: "AI × AI<br />RESEARCH", emoji: "🔬✨", tagline: "Goal-setting only (and we're not there yet)", taglineCompact: "Goal-setting only" }
+    ]
+  }
+};
+
+// =============================================
+// DESIGN CELL DATA
+// =============================================
+
+const designCellData = {
   // EPIAS Stage descriptions (column headers)
   "E": {
     level: "EPIAS",
@@ -900,227 +1056,321 @@ const cellData = {
   },
   
   // SAE L0 - Manual
-  "0-0": {
-    level: "SAE L0 Manual",
-    stage: "Explorer",
-    title: "Learning craft basics",
-    description: "Exploring craft fundamentals; learning manual techniques with inconsistent results. You're discovering the foundations of design work without AI tools.",
-    tags: ["Figma", "Sketch", "Pen & Paper"]
-  },
-  "0-1": {
-    level: "SAE L0 Manual",
-    stage: "Practitioner",
-    title: "Consistent manual workflow",
-    description: "Consistent manual practice with developed habits and repeatable techniques. You've built muscle memory and reliable processes for your craft.",
-    tags: ["Repeatable Process", "Developed Habits"]
-  },
-  "0-2": {
-    level: "SAE L0 Manual",
-    stage: "Integrator",
-    title: "Decisions documented + QA",
-    description: "Manual workflow fully integrated with validation steps, traceability, and clear decision documentation. Your work is reviewable and explainable.",
-    tags: ["Documentation", "Validation", "Traceability"]
-  },
-  "0-3": {
-    level: "SAE L0 Manual",
-    stage: "Architect",
-    title: "Reusable templates others use",
-    description: "Built reusable manual systems, templates, and processes that others on team adopt. Your frameworks enable others to work effectively.",
-    tags: ["Templates", "Team Systems", "Reusable"]
-  },
-  "0-4": {
-    level: "SAE L0 Manual",
-    stage: "Steward",
-    title: "Sets craft standards + mentors",
-    description: "Set organizational standards for craft quality; mentor others in manual techniques; maintain shared design systems. You define what 'good' looks like.",
-    tags: ["Standards", "Mentorship", "Design Systems"]
-  },
+  "0-0": { level: "SAE L0 Manual", stage: "Explorer", title: "Learning craft basics", description: "Exploring craft fundamentals; learning manual techniques with inconsistent results. You're discovering the foundations of design work without AI tools.", tags: ["Figma", "Sketch", "Pen & Paper"] },
+  "0-1": { level: "SAE L0 Manual", stage: "Practitioner", title: "Consistent manual workflow", description: "Consistent manual practice with developed habits and repeatable techniques. You've built muscle memory and reliable processes for your craft.", tags: ["Repeatable Process", "Developed Habits"] },
+  "0-2": { level: "SAE L0 Manual", stage: "Integrator", title: "Decisions documented + QA", description: "Manual workflow fully integrated with validation steps, traceability, and clear decision documentation. Your work is reviewable and explainable.", tags: ["Documentation", "Validation", "Traceability"] },
+  "0-3": { level: "SAE L0 Manual", stage: "Architect", title: "Reusable templates others use", description: "Built reusable manual systems, templates, and processes that others on team adopt. Your frameworks enable others to work effectively.", tags: ["Templates", "Team Systems", "Reusable"] },
+  "0-4": { level: "SAE L0 Manual", stage: "Steward", title: "Sets craft standards + mentors", description: "Set organizational standards for craft quality; mentor others in manual techniques; maintain shared design systems. You define what 'good' looks like.", tags: ["Standards", "Mentorship", "Design Systems"] },
   
   // SAE L1 - AI-Assisted
-  "1-0": {
-    level: "SAE L1 AI-Assisted",
-    stage: "Explorer",
-    title: "Trying prompts + generators",
-    description: "Trying ChatGPT, Microsoft Copilot, Midjourney, Firefly for ideas or drafts; outputs are hit-or-miss and heavily rewritten. AI helps you think, but you heavily curate.",
-    tags: ["ChatGPT", "Midjourney", "Firefly", "Copilot"]
-  },
-  "1-1": {
-    level: "SAE L1 AI-Assisted",
-    stage: "Practitioner",
-    title: "Daily AI usage w/ saved prompts",
-    description: "Using AI daily with saved prompts; consistent structure, tone, and basic quality checks before use. You've developed reliable prompting habits.",
-    tags: ["Saved Prompts", "Daily Usage", "Quality Checks"]
-  },
-  "1-2": {
-    level: "SAE L1 AI-Assisted",
-    stage: "Integrator",
-    title: "AI across full task flow",
-    description: "AI embedded across a full task (research → ideation → draft → refine) with sources noted, decisions explained, and manual validation. End-to-end AI augmentation.",
-    tags: ["Full Workflow", "Source Tracking", "Validation"]
-  },
-  "1-3": {
-    level: "SAE L1 AI-Assisted",
-    stage: "Architect",
-    title: "Shared prompt libraries",
-    description: "Shared prompt libraries, review checklists, and example outputs teammates can reuse and trust. Your prompts become team assets.",
-    tags: ["Prompt Libraries", "Checklists", "Team Resources"]
-  },
-  "1-4": {
-    level: "SAE L1 AI-Assisted",
-    stage: "Steward",
-    title: "Defines team AI usage rules",
-    description: "Team standards for AI-assisted work (what's allowed, how it's reviewed); mentors others on prompting and judgment; governs usage. You shape AI culture.",
-    tags: ["Governance", "Team Standards", "Mentorship"]
-  },
+  "1-0": { level: "SAE L1 AI-Assisted", stage: "Explorer", title: "Trying prompts + generators", description: "Trying ChatGPT, Microsoft Copilot, Midjourney, Firefly for ideas or drafts; outputs are hit-or-miss and heavily rewritten. AI helps you think, but you heavily curate.", tags: ["ChatGPT", "Midjourney", "Firefly", "Copilot"] },
+  "1-1": { level: "SAE L1 AI-Assisted", stage: "Practitioner", title: "Daily AI usage w/ saved prompts", description: "Using AI daily with saved prompts; consistent structure, tone, and basic quality checks before use. You've developed reliable prompting habits.", tags: ["Saved Prompts", "Daily Usage", "Quality Checks"] },
+  "1-2": { level: "SAE L1 AI-Assisted", stage: "Integrator", title: "AI across full task flow", description: "AI embedded across a full task (research → ideation → draft → refine) with sources noted, decisions explained, and manual validation. End-to-end AI augmentation.", tags: ["Full Workflow", "Source Tracking", "Validation"] },
+  "1-3": { level: "SAE L1 AI-Assisted", stage: "Architect", title: "Shared prompt libraries", description: "Shared prompt libraries, review checklists, and example outputs teammates can reuse and trust. Your prompts become team assets.", tags: ["Prompt Libraries", "Checklists", "Team Resources"] },
+  "1-4": { level: "SAE L1 AI-Assisted", stage: "Steward", title: "Defines team AI usage rules", description: "Team standards for AI-assisted work (what's allowed, how it's reviewed); mentors others on prompting and judgment; governs usage. You shape AI culture.", tags: ["Governance", "Team Standards", "Mentorship"] },
   
   // SAE L2 - Partially Automated
-  "2-0": {
-    level: "SAE L2 Partial",
-    stage: "Explorer",
-    title: "Testing app builders",
-    description: "Trying app-builders (Bolt/Lovable/v0/Framer) to generate screens/components; lots of manual stitching and rework. AI builds chunks, you assemble.",
-    tags: ["Bolt", "Lovable", "v0", "Framer"]
-  },
-  "2-1": {
-    level: "SAE L2 Partial",
-    stage: "Practitioner",
-    title: "Repeatable component outputs",
-    description: "Getting repeatable components from clear specs; using a simple 'definition of done' checklist before integrating. Predictable AI outputs.",
-    tags: ["Clear Specs", "Definition of Done", "Repeatable"]
-  },
-  "2-2": {
-    level: "SAE L2 Partial",
-    stage: "Integrator",
-    title: "Outputs fit tokens/layout/a11y",
-    description: "Outputs fit a known integration pattern (tokens/layout/a11y); prompts + inputs are traceable from request → result → final. Quality-controlled generation.",
-    tags: ["Design Tokens", "A11y", "Traceability"]
-  },
-  "2-3": {
-    level: "SAE L2 Partial",
-    stage: "Architect",
-    title: "Prompt packs + component templates",
-    description: "Reusable component/flow templates + prompt packs that teammates can run and get consistent results. Scalable AI-assisted design.",
-    tags: ["Prompt Packs", "Templates", "Consistent Results"]
-  },
-  "2-4": {
-    level: "SAE L2 Partial",
-    stage: "Steward",
-    title: "Defines safe automation boundaries",
-    description: "Team norms for what to automate at L2 (safe chunks vs risky ones); mentors others on integration + QA; governs usage and review expectations.",
-    tags: ["Safe Boundaries", "Risk Assessment", "QA Governance"]
-  },
+  "2-0": { level: "SAE L2 Partial", stage: "Explorer", title: "Testing app builders", description: "Trying app-builders (Bolt/Lovable/v0/Framer) to generate screens/components; lots of manual stitching and rework. AI builds chunks, you assemble.", tags: ["Bolt", "Lovable", "v0", "Framer"] },
+  "2-1": { level: "SAE L2 Partial", stage: "Practitioner", title: "Repeatable component outputs", description: "Getting repeatable components from clear specs; using a simple 'definition of done' checklist before integrating. Predictable AI outputs.", tags: ["Clear Specs", "Definition of Done", "Repeatable"] },
+  "2-2": { level: "SAE L2 Partial", stage: "Integrator", title: "Outputs fit tokens/layout/a11y", description: "Outputs fit a known integration pattern (tokens/layout/a11y); prompts + inputs are traceable from request → result → final. Quality-controlled generation.", tags: ["Design Tokens", "A11y", "Traceability"] },
+  "2-3": { level: "SAE L2 Partial", stage: "Architect", title: "Prompt packs + component templates", description: "Reusable component/flow templates + prompt packs that teammates can run and get consistent results. Scalable AI-assisted design.", tags: ["Prompt Packs", "Templates", "Consistent Results"] },
+  "2-4": { level: "SAE L2 Partial", stage: "Steward", title: "Defines safe automation boundaries", description: "Team norms for what to automate at L2 (safe chunks vs risky ones); mentors others on integration + QA; governs usage and review expectations.", tags: ["Safe Boundaries", "Risk Assessment", "QA Governance"] },
   
   // SAE L3 - Guided Automation
-  "3-0": {
-    level: "SAE L3 Guided",
-    stage: "Explorer",
-    title: "Learning IDE + context rules",
-    description: "Moving work into an IDE (VS Code/Cursor); learning basic context rules; multi-step runs are inconsistent and fragile. Crossing into code territory.",
-    tags: ["VS Code", "Cursor", "IDE", "Context Rules"]
-  },
-  "3-1": {
-    level: "SAE L3 Guided",
-    stage: "Practitioner",
-    title: "Multi-step runs w/ checkpoints",
-    description: "Running reliable multi-step workflows inside the IDE with explicit checkpoints (plan → generate → review → revise); lightweight evals by default.",
-    tags: ["Checkpoints", "Multi-step", "Evals"]
-  },
-  "3-2": {
-    level: "SAE L3 Guided",
-    stage: "Integrator",
-    title: "Human-AI approval model",
-    description: "Clear decision framing for IDE-run workflows: what AI executes, what humans approve, and when to intervene; failure modes documented.",
-    tags: ["Approval Gates", "Intervention Points", "Failure Modes"]
-  },
-  "3-3": {
-    level: "SAE L3 Guided",
-    stage: "Architect",
-    title: "Shared IDE workflows + evals",
-    description: "Shared IDE-invoked workflows: Skills/MCP tools, context libraries (brand, design system, constraints), and reusable eval templates teammates can run.",
-    tags: ["Skills", "MCP Tools", "Context Libraries"]
-  },
-  "3-4": {
-    level: "SAE L3 Guided",
-    stage: "Steward",
-    title: "Org standards for context + safety",
-    description: "Org standards for IDE-based AI work (safety, quality, traceability); mentorship on context engineering; maintains shared Skills/MCP used from IDEs.",
-    tags: ["Org Standards", "Context Engineering", "Safety"]
-  },
+  "3-0": { level: "SAE L3 Guided", stage: "Explorer", title: "Learning IDE + context rules", description: "Moving work into an IDE (VS Code/Cursor); learning basic context rules; multi-step runs are inconsistent and fragile. Crossing into code territory.", tags: ["VS Code", "Cursor", "IDE", "Context Rules"] },
+  "3-1": { level: "SAE L3 Guided", stage: "Practitioner", title: "Multi-step runs w/ checkpoints", description: "Running reliable multi-step workflows inside the IDE with explicit checkpoints (plan → generate → review → revise); lightweight evals by default.", tags: ["Checkpoints", "Multi-step", "Evals"] },
+  "3-2": { level: "SAE L3 Guided", stage: "Integrator", title: "Human-AI approval model", description: "Clear decision framing for IDE-run workflows: what AI executes, what humans approve, and when to intervene; failure modes documented.", tags: ["Approval Gates", "Intervention Points", "Failure Modes"] },
+  "3-3": { level: "SAE L3 Guided", stage: "Architect", title: "Shared IDE workflows + evals", description: "Shared IDE-invoked workflows: Skills/MCP tools, context libraries (brand, design system, constraints), and reusable eval templates teammates can run.", tags: ["Skills", "MCP Tools", "Context Libraries"] },
+  "3-4": { level: "SAE L3 Guided", stage: "Steward", title: "Org standards for context + safety", description: "Org standards for IDE-based AI work (safety, quality, traceability); mentorship on context engineering; maintains shared Skills/MCP used from IDEs.", tags: ["Org Standards", "Context Engineering", "Safety"] },
   
   // SAE L4 - Mostly Automated
-  "4-0": {
-    level: "SAE L4 Mostly",
-    stage: "Explorer",
-    title: "Testing agent pipelines",
-    description: "Experimenting with autonomous harnesses and agent pipelines; results require heavy validation and manual debugging. Early autonomous exploration.",
-    tags: ["Agent Pipelines", "Harnesses", "Validation"]
-  },
-  "4-1": {
-    level: "SAE L4 Mostly",
-    stage: "Practitioner",
-    title: "Reliable eval + retry patterns",
-    description: "Operating harnesses with repeatable execution patterns; evals, retries, and escalation paths are consistently applied. Reliable autonomous execution.",
-    tags: ["Evals", "Retries", "Escalation Paths"]
-  },
-  "4-2": {
-    level: "SAE L4 Mostly",
-    stage: "Integrator",
-    title: "Autonomous workflows w/ recovery",
-    description: "End-to-end workflows run autonomously; comprehensive eval suites validate outputs; exception classes and recovery paths documented.",
-    tags: ["E2E Autonomous", "Exception Handling", "Recovery"]
-  },
-  "4-3": {
-    level: "SAE L4 Mostly",
-    stage: "Architect",
-    title: "Production agent infrastructure",
-    description: "Built production-grade agent infrastructure others operate: self-improving harnesses, shared skill libraries, eval-driven pipelines.",
-    tags: ["Production-Grade", "Self-Improving", "Infrastructure"]
-  },
-  "4-4": {
-    level: "SAE L4 Mostly",
-    stage: "Steward",
-    title: "Defines autonomy governance",
-    description: "Governance for autonomous systems at scale; defines risk thresholds, approval gates, and accountability; maintains org-level eval and autonomy infrastructure.",
-    tags: ["Governance", "Risk Thresholds", "Accountability"]
-  },
+  "4-0": { level: "SAE L4 Mostly", stage: "Explorer", title: "Testing agent pipelines", description: "Experimenting with autonomous harnesses and agent pipelines; results require heavy validation and manual debugging. Early autonomous exploration.", tags: ["Agent Pipelines", "Harnesses", "Validation"] },
+  "4-1": { level: "SAE L4 Mostly", stage: "Practitioner", title: "Reliable eval + retry patterns", description: "Operating harnesses with repeatable execution patterns; evals, retries, and escalation paths are consistently applied. Reliable autonomous execution.", tags: ["Evals", "Retries", "Escalation Paths"] },
+  "4-2": { level: "SAE L4 Mostly", stage: "Integrator", title: "Autonomous workflows w/ recovery", description: "End-to-end workflows run autonomously; comprehensive eval suites validate outputs; exception classes and recovery paths documented.", tags: ["E2E Autonomous", "Exception Handling", "Recovery"] },
+  "4-3": { level: "SAE L4 Mostly", stage: "Architect", title: "Production agent infrastructure", description: "Built production-grade agent infrastructure others operate: self-improving harnesses, shared skill libraries, eval-driven pipelines.", tags: ["Production-Grade", "Self-Improving", "Infrastructure"] },
+  "4-4": { level: "SAE L4 Mostly", stage: "Steward", title: "Defines autonomy governance", description: "Governance for autonomous systems at scale; defines risk thresholds, approval gates, and accountability; maintains org-level eval and autonomy infrastructure.", tags: ["Governance", "Risk Thresholds", "Accountability"] },
   
   // SAE L5 - Full Automation
-  "5-0": {
-    level: "SAE L5 Full",
+  "5-0": { level: "SAE L5 Full", stage: "Explorer", title: "Exploring goal-based AI", description: "Exploring goal-setting interfaces for autonomous AI; exception handling is unclear. The AGI frontier—still theoretical.", tags: ["Goal-Setting", "Theoretical", "AGI"] },
+  "5-1": { level: "SAE L5 Full", stage: "Practitioner", title: "Consistent approval gates", description: "Setting approval gates and quality bars consistently; routine review of autonomous outputs. Governance over fully autonomous systems.", tags: ["Approval Gates", "Quality Bars", "Routine Review"] },
+  "5-2": { level: "SAE L5 Full", stage: "Integrator", title: "Exception-driven autonomy", description: "Autonomous workflows validated with exception handling systems; clear escalation paths documented. Humans handle exceptions, not execution.", tags: ["Exception Handling", "Escalation", "Hands-Off"] },
+  "5-3": { level: "SAE L5 Full", stage: "Architect", title: "Goal frameworks others trust", description: "Designed goal-setting and approval systems that others trust; reusable governance frameworks. Building the future of AI governance.", tags: ["Goal Systems", "Trust", "Governance Frameworks"] },
+  "5-4": { level: "SAE L5 Full", stage: "Steward", title: "Org-wide AI governance", description: "Enterprise governance for fully autonomous AI; set approval frameworks; organizational AI risk and trust standards. Shaping AI's role in the org.", tags: ["Enterprise Governance", "Risk Standards", "Trust Standards"] }
+};
+
+// =============================================
+// UXR CELL DATA
+// =============================================
+
+const uxrCellData = {
+  // EPIAS Stage descriptions (column headers) - same structure, UXR context
+  "E": {
+    level: "EPIAS",
     stage: "Explorer",
-    title: "Exploring goal-based AI",
-    description: "Exploring goal-setting interfaces for autonomous AI; exception handling is unclear. The AGI frontier—still theoretical.",
-    tags: ["Goal-Setting", "Theoretical", "AGI"]
+    title: "❶ E: Explorer",
+    description: "Trying things; learning basics. You're experimenting with new tools and techniques, results are inconsistent but you're building foundational understanding of AI in research.",
+    tags: ["Learning", "Experimenting", "Variable Quality"]
   },
-  "5-1": {
-    level: "SAE L5 Full",
+  "P": {
+    level: "EPIAS",
     stage: "Practitioner",
-    title: "Consistent approval gates",
-    description: "Setting approval gates and quality bars consistently; routine review of autonomous outputs. Governance over fully autonomous systems.",
-    tags: ["Approval Gates", "Quality Bars", "Routine Review"]
+    title: "❷ P: Practitioner",
+    description: "Building consistent habits. Consistent process with repeatable methods and reliable evidence. You've developed steady verification habits.",
+    tags: ["Consistent", "Reliable", "Repeatable Methods"]
   },
-  "5-2": {
-    level: "SAE L5 Full",
+  "I": {
+    level: "EPIAS",
     stage: "Integrator",
-    title: "Exception-driven autonomy",
-    description: "Autonomous workflows validated with exception handling systems; clear escalation paths documented. Humans handle exceptions, not execution.",
-    tags: ["Exception Handling", "Escalation", "Hands-Off"]
+    title: "❸ I: Integrator",
+    description: "Research embedded in product decisions with clear evidence chains. Your insights have traceability and documented validation.",
+    tags: ["Embedded", "Evidence Chains", "Validated"]
   },
-  "5-3": {
-    level: "SAE L5 Full",
+  "A": {
+    level: "EPIAS",
     stage: "Architect",
-    title: "Goal frameworks others trust",
-    description: "Designed goal-setting and approval systems that others trust; reusable governance frameworks. Building the future of AI governance.",
-    tags: ["Goal Systems", "Trust", "Governance Frameworks"]
+    title: "❹ A: Architect",
+    description: "Building research systems others adopt. You create reusable frameworks, verification protocols, and infrastructure that enable the team.",
+    tags: ["Systems", "Reusable", "Team-Enabling"]
   },
-  "5-4": {
-    level: "SAE L5 Full",
+  "S": {
+    level: "EPIAS",
     stage: "Steward",
-    title: "Org-wide AI governance",
-    description: "Enterprise governance for fully autonomous AI; set approval frameworks; organizational AI risk and trust standards. Shaping AI's role in the org.",
-    tags: ["Enterprise Governance", "Risk Standards", "Trust Standards"]
+    title: "❺ S: Steward",
+    description: "Setting org standards for research quality; mentoring others on verification and evidence integrity; maintaining shared infrastructure.",
+    tags: ["Standards", "Mentorship", "Governance"]
+  },
+  
+  // SAE Level descriptions (first column) - UXR specific
+  "L0": {
+    level: "SAE L0",
+    stage: "Manual",
+    title: "🔬 No Automation",
+    description: "\"I do all research manually. Tools store data but don't interpret it. Manual coding, spreadsheets, slides.\"",
+    tags: ["Docs", "Spreadsheets", "Miro", "Manual Coding"]
+  },
+  "L1": {
+    level: "SAE L1",
+    stage: "Research Assistance",
+    title: "🔬➕ Research Assistance",
+    description: "\"I use AI for one task at a time (summaries, screeners). I verify everything against source. Human drives; AI assists one function.\"",
+    tags: ["ChatGPT", "Claude", "Otter", "Transcription Tools"]
+  },
+  "L2": {
+    level: "SAE L2",
+    stage: "Partial Automation",
+    title: "🔬🧠 Partial Automation",
+    description: "\"AI does multi-step synthesis. I supervise live and correct as it goes. Human supervises; AI does multi-step work.\"",
+    tags: ["Looppanel", "Dovetail AI", "Marvin", "Condens", "Great Question", "Maze AI"]
+  },
+  "L3": {
+    level: "SAE L3",
+    stage: "Conditional Automation",
+    title: "🔬😴 Conditional Automation",
+    description: "\"I define a Research ODD. AI runs end-to-end until it hits ambiguity, then escalates. Repository workflows with verification gates.\"",
+    tags: ["Repository Workflows", "Verification Gates", "Research ODD"]
+  },
+  "L4": {
+    level: "SAE L4",
+    stage: "High Automation",
+    title: "🔬🤖 High Automation",
+    description: "\"In bounded areas, AI produces insights without me. I audit periodically. Automated pipelines and eval suites.\"",
+    tags: ["Automated Pipelines", "Eval Suites", "Exception Alerts"]
+  },
+  "L5": {
+    level: "SAE L5",
+    stage: "Full Automation",
+    title: "🔬✨ Full Automation",
+    description: "\"AI handles novel studies, methods, ethics, org politics end-to-end. Theoretical only—not a credible operating mode in 2026.\"",
+    tags: ["Theoretical", "Not Yet Real", "AGI Future"]
+  },
+  
+  // SAE L0 - Manual (UXR)
+  "0-0": { level: "SAE L0 Manual", stage: "Explorer", title: "Learning methods", description: "Learning research methods; variable quality; needs guidance. Discovering the foundations of UX research without AI tools.", tags: ["Learning", "Interview Skills", "Note-taking"] },
+  "0-1": { level: "SAE L0 Manual", stage: "Practitioner", title: "Consistent process", description: "Consistent process with repeatable methods and reliable evidence. Built muscle memory for research fundamentals.", tags: ["Repeatable Methods", "Reliable Evidence"] },
+  "0-2": { level: "SAE L0 Manual", stage: "Integrator", title: "Evidence chains documented", description: "Research embedded in product decisions; clear evidence chains documented. Work is reviewable and explainable.", tags: ["Documentation", "Evidence Chains", "Traceability"] },
+  "0-3": { level: "SAE L0 Manual", stage: "Architect", title: "Reusable systems others adopt", description: "Built reusable research systems, templates, and processes that others on team adopt.", tags: ["Templates", "Research Systems", "Reusable"] },
+  "0-4": { level: "SAE L0 Manual", stage: "Steward", title: "Sets org standards + mentors", description: "Set org standards for research quality; mentor others in manual techniques; maintain shared research infrastructure.", tags: ["Standards", "Mentorship", "Research Ops"] },
+  
+  // SAE L1 - Research Assistance (UXR)
+  "1-0": { level: "SAE L1 Research Assistance", stage: "Explorer", title: "Trying AI for summaries", description: "Trying AI for summaries; heavy rewriting; ad hoc verification. AI helps you think, but you heavily curate.", tags: ["ChatGPT", "Claude", "Otter", "Transcription"] },
+  "1-1": { level: "SAE L1 Research Assistance", stage: "Practitioner", title: "Daily AI + always verify", description: "Daily AI use with saved prompts; always verify against transcripts. Developed reliable prompting and verification habits.", tags: ["Saved Prompts", "Transcript Verification", "Daily Usage"] },
+  "1-2": { level: "SAE L1 Research Assistance", stage: "Integrator", title: "AI across full task w/ sources", description: "AI embedded across full task with sources noted and claims linked. Document when AI assisted and what you verified.", tags: ["Full Workflow", "Source Tracking", "Claim Linking"] },
+  "1-3": { level: "SAE L1 Research Assistance", stage: "Architect", title: "Prompt libraries + verification", description: "Shared prompt libraries and verification templates others trust. Your prompts become team assets.", tags: ["Prompt Libraries", "Verification Templates", "Team Resources"] },
+  "1-4": { level: "SAE L1 Research Assistance", stage: "Steward", title: "Team standards for AI work", description: "Team standards for AI-assisted work; mentors on verification. Critical: Never trust AI quotes without checking source.", tags: ["Governance", "Team Standards", "Verification Mentorship"] },
+  
+  // SAE L2 - Partial Automation (UXR)
+  "2-0": { level: "SAE L2 Partial", stage: "Explorer", title: "Trying synthesis tools", description: "Trying synthesis tools; lots of manual verification needed. AI builds themes, you validate against transcripts.", tags: ["Looppanel", "Dovetail AI", "Marvin"] },
+  "2-1": { level: "SAE L2 Partial", stage: "Practitioner", title: "Repeatable themes + checklist", description: "Repeatable themes from clear inputs; 'definition of done' checklist. Sample verify 20-30% against transcripts.", tags: ["Clear Inputs", "Definition of Done", "Spot-checking"] },
+  "2-2": { level: "SAE L2 Partial", stage: "Integrator", title: "Full traceability documented", description: "AI synthesis fits known patterns; full traceability documented. Check that quoted text actually exists; mark confidence levels.", tags: ["Traceability", "Confidence Levels", "Quote Verification"] },
+  "2-3": { level: "SAE L2 Partial", stage: "Architect", title: "Templates + verification protocols", description: "Reusable templates + verification protocols others can run consistently. Scalable AI-assisted synthesis.", tags: ["Templates", "Verification Protocols", "Scalable"] },
+  "2-4": { level: "SAE L2 Partial", stage: "Steward", title: "Norms for safe vs risky automation", description: "Team norms for safe vs. risky automation. NN/g warning: AI synthesis tools miss non-verbal cues from usability tests.", tags: ["Safe Boundaries", "Risk Assessment", "Behavioral Gaps"] },
+  
+  // SAE L3 - Conditional Automation (UXR)
+  "3-0": { level: "SAE L3 Conditional", stage: "Explorer", title: "Learning Research ODDs", description: "Learning to define Research ODDs; inconsistent results. Operational Design Domain = safe operating zone for AI work.", tags: ["Research ODD", "Boundaries", "Inconsistent"] },
+  "3-1": { level: "SAE L3 Conditional", stage: "Practitioner", title: "Multi-study + checkpoints", description: "Reliable multi-study workflows with explicit checkpoints. AI runs within bounds until uncertainty, then escalates.", tags: ["Multi-study", "Checkpoints", "Escalation"] },
+  "3-2": { level: "SAE L3 Conditional", stage: "Integrator", title: "Clear AI/human framing", description: "Clear decision framing: what AI does, what humans validate. Inter-rater reliability (AI vs. human coding).", tags: ["Decision Framing", "Validation Gates", "Inter-rater"] },
+  "3-3": { level: "SAE L3 Conditional", stage: "Architect", title: "Shared repository workflows", description: "Shared repository workflows others can run. Contradiction detection across studies; confidence scoring.", tags: ["Repository Workflows", "Contradiction Detection", "Confidence Scoring"] },
+  "3-4": { level: "SAE L3 Conditional", stage: "Steward", title: "Org standards for repository AI", description: "Org standards for repository-based AI research. Clear escalation triggers; audit trails for synthesis decisions.", tags: ["Org Standards", "Audit Trails", "Escalation Triggers"] },
+  
+  // SAE L4 - High Automation (UXR)
+  "4-0": { level: "SAE L4 High", stage: "Explorer", title: "Experimenting with pipelines", description: "Experimenting with pipelines; heavy validation needed. Testing automated insight generation.", tags: ["Pipelines", "Heavy Validation", "Experimentation"] },
+  "4-1": { level: "SAE L4 High", stage: "Practitioner", title: "Repeatable pipeline patterns", description: "Operating pipelines with repeatable patterns. Automated quality gates before human review.", tags: ["Repeatable Pipelines", "Quality Gates", "Human Review"] },
+  "4-2": { level: "SAE L4 High", stage: "Integrator", title: "End-to-end for bounded types", description: "End-to-end workflows for bounded study types. Exception-based: humans intervene only when rules trigger.", tags: ["Bounded Studies", "Exception-Based", "Rule Triggers"] },
+  "4-3": { level: "SAE L4 High", stage: "Architect", title: "Production-grade infrastructure", description: "Built production-grade infrastructure others operate. Weekly automated insight digests; auto-tagging.", tags: ["Production Infrastructure", "Insight Digests", "Auto-tagging"] },
+  "4-4": { level: "SAE L4 High", stage: "Steward", title: "Governance at scale", description: "Governance for autonomous research at scale. L4 only works in constrained domains with stable methods.", tags: ["Governance", "Constrained Domains", "Measurable Gates"] },
+  
+  // SAE L5 - Full Automation (UXR)
+  "5-0": { level: "SAE L5 Full", stage: "Explorer", title: "Exploring goal-based research AI", description: "Exploring goal-based research AI. Not a credible operating mode in 2026—theoretical only.", tags: ["Goal-Based", "Theoretical", "Future"] },
+  "5-1": { level: "SAE L5 Full", stage: "Practitioner", title: "Approval gates + quality bars", description: "Setting approval gates and quality bars consistently. Routine review of autonomous outputs.", tags: ["Approval Gates", "Quality Bars", "Routine Review"] },
+  "5-2": { level: "SAE L5 Full", stage: "Integrator", title: "Exception-driven research", description: "Exception-driven research workflows. Humans handle exceptions, not execution.", tags: ["Exception-Driven", "Escalation", "Hands-Off"] },
+  "5-3": { level: "SAE L5 Full", stage: "Architect", title: "Goal frameworks others trust", description: "Designed goal-setting systems others trust. Building the future of autonomous research governance.", tags: ["Goal Systems", "Trust", "Research Governance"] },
+  "5-4": { level: "SAE L5 Full", stage: "Steward", title: "Org-wide research AI governance", description: "Enterprise governance for fully autonomous research AI. We're nowhere close to L5 in 2026.", tags: ["Enterprise Governance", "Theoretical", "Future State"] }
+};
+
+// =============================================
+// CELL LABELS BY ROLE
+// =============================================
+
+const cellLabels = {
+  design: {
+    "0-0": "Learning craft basics",
+    "0-1": "Consistent manual workflow",
+    "0-2": "Decisions documented + QA",
+    "0-3": "Reusable templates others use",
+    "0-4": "Sets craft standards + mentors",
+    "1-0": "Trying prompts + generators",
+    "1-1": "Daily AI usage w/ saved prompts",
+    "1-2": "AI across full task flow",
+    "1-3": "Shared prompt libraries",
+    "1-4": "Defines team AI usage rules",
+    "2-0": "Testing app builders",
+    "2-1": "Repeatable component outputs",
+    "2-2": "Outputs fit tokens/layout/a11y",
+    "2-3": "Prompt packs + component templates",
+    "2-4": "Defines safe automation boundaries",
+    "3-0": "Learning IDE + context rules",
+    "3-1": "Multi-step runs w/ checkpoints",
+    "3-2": "Human-AI approval model",
+    "3-3": "Shared IDE workflows + evals",
+    "3-4": "Org standards for context + safety",
+    "4-0": "Testing agent pipelines",
+    "4-1": "Reliable eval + retry patterns",
+    "4-2": "Autonomous workflows w/ recovery",
+    "4-3": "Production agent infrastructure",
+    "4-4": "Defines autonomy governance",
+    "5-0": "Exploring goal-based AI",
+    "5-1": "Consistent approval gates",
+    "5-2": "Exception-driven autonomy",
+    "5-3": "Goal frameworks others trust",
+    "5-4": "Org-wide AI governance"
+  },
+  uxr: {
+    "0-0": "Learning methods",
+    "0-1": "Consistent process",
+    "0-2": "Evidence chains documented",
+    "0-3": "Reusable systems others adopt",
+    "0-4": "Sets org standards + mentors",
+    "1-0": "Trying AI for summaries",
+    "1-1": "Daily AI + always verify",
+    "1-2": "AI across full task w/ sources",
+    "1-3": "Prompt libraries + verification",
+    "1-4": "Team standards for AI work",
+    "2-0": "Trying synthesis tools",
+    "2-1": "Repeatable themes + checklist",
+    "2-2": "Full traceability documented",
+    "2-3": "Templates + verification protocols",
+    "2-4": "Norms for safe vs risky automation",
+    "3-0": "Learning Research ODDs",
+    "3-1": "Multi-study + checkpoints",
+    "3-2": "Clear AI/human framing",
+    "3-3": "Shared repository workflows",
+    "3-4": "Org standards for repository AI",
+    "4-0": "Experimenting with pipelines",
+    "4-1": "Repeatable pipeline patterns",
+    "4-2": "End-to-end for bounded types",
+    "4-3": "Production-grade infrastructure",
+    "4-4": "Governance at scale",
+    "5-0": "Exploring goal-based research AI",
+    "5-1": "Approval gates + quality bars",
+    "5-2": "Exception-driven research",
+    "5-3": "Goal frameworks others trust",
+    "5-4": "Org-wide research AI governance"
   }
 };
+
+// Compact labels (shorter versions)
+const cellLabelsCompact = {
+  design: {
+    "0-0": "Learning craft basics",
+    "0-1": "Consistent manual workflow",
+    "0-2": "Decisions documented + QA",
+    "0-3": "Reusable templates others use",
+    "0-4": "Sets craft standards + mentors",
+    "1-0": "Trying prompts + generators",
+    "1-1": "Daily AI w/ saved prompts",
+    "1-2": "AI across full task flow",
+    "1-3": "Shared prompt libraries",
+    "1-4": "Defines team AI rules",
+    "2-0": "Testing app builders",
+    "2-1": "Repeatable components",
+    "2-2": "Fits tokens/layout/a11y",
+    "2-3": "Prompt packs + templates",
+    "2-4": "Safe automation bounds",
+    "3-0": "Learning IDE + context",
+    "3-1": "Multi-step + checkpoints",
+    "3-2": "Human-AI approval",
+    "3-3": "Shared IDE workflows",
+    "3-4": "Org context + safety",
+    "4-0": "Testing agent pipelines",
+    "4-1": "Reliable eval + retry",
+    "4-2": "Autonomous + recovery",
+    "4-3": "Production agent infra",
+    "4-4": "Autonomy governance",
+    "5-0": "Exploring goal-based AI",
+    "5-1": "Consistent approval gates",
+    "5-2": "Exception-driven",
+    "5-3": "Trusted goal frameworks",
+    "5-4": "Org-wide AI governance"
+  },
+  uxr: {
+    "0-0": "Learning methods",
+    "0-1": "Consistent process",
+    "0-2": "Evidence chains",
+    "0-3": "Systems others adopt",
+    "0-4": "Org standards + mentors",
+    "1-0": "AI for summaries",
+    "1-1": "Daily AI + verify",
+    "1-2": "Full task w/ sources",
+    "1-3": "Prompts + verification",
+    "1-4": "Team AI standards",
+    "2-0": "Synthesis tools",
+    "2-1": "Themes + checklist",
+    "2-2": "Full traceability",
+    "2-3": "Templates + protocols",
+    "2-4": "Safe vs risky norms",
+    "3-0": "Research ODDs",
+    "3-1": "Multi-study + checks",
+    "3-2": "AI/human framing",
+    "3-3": "Repository workflows",
+    "3-4": "Repository AI standards",
+    "4-0": "Pipeline experiments",
+    "4-1": "Pipeline patterns",
+    "4-2": "E2E bounded types",
+    "4-3": "Production infra",
+    "4-4": "Governance at scale",
+    "5-0": "Goal-based research AI",
+    "5-1": "Approval gates",
+    "5-2": "Exception-driven",
+    "5-3": "Trusted frameworks",
+    "5-4": "Research AI governance"
+  }
+};
+
+// Get current cell data based on role
+function getCellData() {
+  const role = document.documentElement.getAttribute('data-role') || 'design';
+  return role === 'uxr' ? uxrCellData : designCellData;
+}
 
 // Store checkbox states
 let checkboxStates = {};
@@ -1137,6 +1387,13 @@ function loadStates() {
 // Save states to localStorage
 function saveStates() {
   localStorage.setItem('gameboard-states', JSON.stringify(checkboxStates));
+}
+
+// Clear all checkbox states
+function clearAllStates() {
+  checkboxStates = {};
+  saveStates();
+  applyStates();
 }
 
 // Apply states to all checkboxes
@@ -1159,7 +1416,7 @@ function handleCheckboxClick(e) {
   const cell = cb.getAttribute('data-cell');
   checkboxStates[cell] = !checkboxStates[cell];
   saveStates();
-  applyStates(); // Sync all checkboxes with same data-cell
+  applyStates();
 }
 
 // Add click listeners to all checkboxes
@@ -1169,6 +1426,7 @@ document.querySelectorAll('.checkbox[data-cell]').forEach(cb => {
 
 // Modal functions
 function openModal(cellId) {
+  const cellData = getCellData();
   const data = cellData[cellId];
   if (!data) return;
   
@@ -1204,6 +1462,7 @@ document.addEventListener('keydown', function(e) {
 
 // Add info icons to all cell labels
 function addInfoIcons() {
+  const cellData = getCellData();
   document.querySelectorAll('.cell-content').forEach(cell => {
     const checkbox = cell.querySelector('.checkbox[data-cell]');
     const label = cell.querySelector('.cell-label');
@@ -1244,6 +1503,7 @@ function addInfoIcons() {
 
 // Add event listeners to level info icons
 function addLevelInfoListeners() {
+  const cellData = getCellData();
   document.querySelectorAll('.info-icon[data-level]').forEach(icon => {
     const levelId = icon.getAttribute('data-level');
     if (!cellData[levelId]) return;
@@ -1263,6 +1523,7 @@ function addLevelInfoListeners() {
 
 // Add event listeners to stage (EPIAS) info icons
 function addStageInfoListeners() {
+  const cellData = getCellData();
   document.querySelectorAll('.info-icon[data-stage]').forEach(icon => {
     const stageId = icon.getAttribute('data-stage');
     if (!cellData[stageId]) return;
@@ -1280,6 +1541,36 @@ function addStageInfoListeners() {
   });
 }
 
+// Screenshot function
+async function takeScreenshot() {
+  try {
+    // Get background color from CSS variable for correct theme capture
+    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+    
+    const canvas = await html2canvas(document.body, {
+      windowWidth: document.documentElement.scrollWidth,
+      windowHeight: document.documentElement.scrollHeight,
+      width: document.documentElement.scrollWidth,
+      height: document.documentElement.scrollHeight,
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      scale: 1,
+      useCORS: true,
+      backgroundColor: bgColor || '#0d1117'
+    });
+    
+    // Generate timestamped filename and download
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const link = document.createElement('a');
+    link.download = `gameboard-${timestamp}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch (error) {
+    console.error('Screenshot failed:', error);
+    alert('Screenshot failed. Please try again.');
+  }
+}
+
 function toggleTheme() {
   const html = document.documentElement;
   const currentTheme = html.getAttribute('data-theme');
@@ -1295,17 +1586,117 @@ function toggleView() {
   html.setAttribute('data-view', newView);
   localStorage.setItem('view', newView);
   
-  // Update all button labels
   document.querySelectorAll('.btn-label').forEach(label => {
     label.textContent = newView === 'full' ? 'Compact' : 'Expand';
   });
   
-  // Re-apply checkbox states after view switch
   applyStates();
   
-  // Re-add info icons and level listeners (needed for compact view elements)
   setTimeout(function() {
     addInfoIcons();
+    addLevelInfoListeners();
+    addStageInfoListeners();
+  }, 10);
+}
+
+// =============================================
+// ROLE TOGGLE FUNCTIONS
+// =============================================
+
+function toggleRole() {
+  const html = document.documentElement;
+  const currentRole = html.getAttribute('data-role') || 'design';
+  const newRole = currentRole === 'design' ? 'uxr' : 'design';
+  setRole(newRole);
+}
+
+function setRole(role) {
+  const html = document.documentElement;
+  html.setAttribute('data-role', role);
+  localStorage.setItem('role', role);
+  
+  // Update toggle labels
+  document.querySelectorAll('.role-toggle-label').forEach(label => {
+    const labelRole = label.getAttribute('data-role-label');
+    if (labelRole === role) {
+      label.classList.add('active');
+    } else {
+      label.classList.remove('active');
+    }
+  });
+  
+  // Update page content
+  updateContentForRole(role);
+}
+
+function updateContentForRole(role) {
+  const config = roleConfig[role];
+  if (!config) return;
+  
+  // Update header
+  document.getElementById('page-title').textContent = config.title;
+  document.getElementById('page-subtitle').innerHTML = config.subtitle + ' | <a id="github-link" href="' + config.githubLink + '">On GitHub</a>';
+  
+  // Update level names and taglines in full view
+  const fullViewSections = document.querySelectorAll('.full-view .level-section');
+  fullViewSections.forEach((section, index) => {
+    if (config.levels[index]) {
+      const levelConfig = config.levels[index];
+      const header = section.querySelector('.level-header h3');
+      const tagline = section.querySelector('.tagline');
+      if (header) {
+        header.innerHTML = levelConfig.name + (levelConfig.emoji ? ' (' + levelConfig.emoji + ')' : '') + ' | No Automation'.replace('No Automation', '');
+        // Special handling for first row
+        if (index === 0) {
+          header.textContent = levelConfig.name + ' (' + levelConfig.emoji + ' AI) | No Automation';
+        } else if (index === 5) {
+          header.textContent = levelConfig.name;
+        } else {
+          header.textContent = levelConfig.name;
+        }
+      }
+      if (tagline) tagline.textContent = levelConfig.tagline;
+    }
+  });
+  
+  // Update compact view level names
+  const compactRows = document.querySelectorAll('.compact-view tbody tr');
+  compactRows.forEach((row, index) => {
+    if (config.levels[index]) {
+      const levelConfig = config.levels[index];
+      const levelName = row.querySelector('.level-name');
+      const levelTagline = row.querySelector('.level-tagline');
+      if (levelName) levelName.innerHTML = levelConfig.nameCompact;
+      if (levelTagline) levelTagline.textContent = levelConfig.taglineCompact;
+    }
+  });
+  
+  // Update cell labels
+  const labels = cellLabels[role];
+  const labelsCompact = cellLabelsCompact[role];
+  
+  document.querySelectorAll('.full-view .cell-label').forEach(label => {
+    const checkbox = label.closest('.cell-content')?.querySelector('.checkbox[data-cell]');
+    if (checkbox) {
+      const cellId = checkbox.getAttribute('data-cell');
+      if (labels[cellId]) {
+        label.textContent = labels[cellId];
+      }
+    }
+  });
+  
+  document.querySelectorAll('.compact-view .cell-label').forEach(label => {
+    const checkbox = label.closest('.cell-content')?.querySelector('.checkbox[data-cell]');
+    if (checkbox) {
+      const cellId = checkbox.getAttribute('data-cell');
+      if (labelsCompact[cellId]) {
+        label.textContent = labelsCompact[cellId];
+      }
+    }
+  });
+  
+  // Re-bind info icon listeners with new data
+  setTimeout(function() {
     addLevelInfoListeners();
     addStageInfoListeners();
   }, 10);
@@ -1326,6 +1717,23 @@ function toggleView() {
     document.querySelectorAll('.btn-label').forEach(label => {
       label.textContent = savedView === 'full' ? 'Compact' : 'Expand';
     });
+  }
+  
+  // Load saved role
+  const savedRole = localStorage.getItem('role');
+  if (savedRole) {
+    document.documentElement.setAttribute('data-role', savedRole);
+    // Update toggle labels
+    document.querySelectorAll('.role-toggle-label').forEach(label => {
+      const labelRole = label.getAttribute('data-role-label');
+      if (labelRole === savedRole) {
+        label.classList.add('active');
+      } else {
+        label.classList.remove('active');
+      }
+    });
+    // Update content
+    updateContentForRole(savedRole);
   }
   
   // Load checkbox states
